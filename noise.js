@@ -1,3 +1,4 @@
+/*jshint strict:false*/
 var p = [
 	151,160,137,91,90,15,
 	131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
@@ -27,6 +28,21 @@ var p = [
 	138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180
 ];
 
+function fade(t) {
+	return t * t * t * (t * (t * 6 - 15) + 10);
+}
+
+function lerp(t, a, b) {
+	return a + t * (b - a);
+}
+
+function grad(hash, x, y, z) {
+	var h = hash & 15; // CONVERT LO 4 BITS OF HASH CODE
+	var u = h < 8 ? x : y; // INTO 12 GRADIENT DIRECTIONS.
+	var v = h < 4 ? y : h === 12 || h === 14 ? x : z;
+	return ((h & 1) === 0 ? u : -u) + ((h & 2) === 0 ? v : -v);
+}
+
 function noise2d(x, y) {
 	var X = Math.floor(x) & 255;
 	var Y = Math.floor(y) & 255;
@@ -37,66 +53,52 @@ function noise2d(x, y) {
 	var u = fade(x);
 	var v = fade(y);
 
-	var A = p[X  ]+Y;
+	var A = p[X] + Y;
 	var AA = p[A];
-	var AB = p[A+1];
+	var AB = p[A + 1];
 
-	var B = p[X+1]+Y;
+	var B = p[X + 1] + Y;
 	var BA = p[B];
-	var BB = p[B+1];
+	var BB = p[B + 1];
 
-	return lerp(v, lerp(u, grad(p[AA  ], x  , y  , 0),
-		grad(p[BA  ], x-1, y  , 0)),
-		lerp(u, grad(p[AB  ], x  , y-1, 0),
-		grad(p[BB  ], x-1, y-1, 0)));
+	return lerp(v,
+		lerp(u, grad(p[AA], x, y, 0), grad(p[BA], x - 1, y, 0)),
+		lerp(u, grad(p[AB], x, y - 1, 0), grad(p[BB], x - 1, y - 1, 0))
+	);
 }
 
 function noise3d(x, y, z) {
-      var X = Math.floor(x) & 255;                  // FIND UNIT CUBE THAT
-      var Y = Math.floor(y) & 255;                  // CONTAINS POINT.
-      var Z = Math.floor(z) & 255;
+	var X = Math.floor(x) & 255; // FIND UNIT CUBE THAT
+	var Y = Math.floor(y) & 255; // CONTAINS POINT.
+	var Z = Math.floor(z) & 255;
 
-      x -= Math.floor(x);                                // FIND RELATIVE X,Y,Z
-      y -= Math.floor(y);                                // OF POINT IN CUBE.
-      z -= Math.floor(z);
+	x -= Math.floor(x); // FIND RELATIVE X,Y,Z
+	y -= Math.floor(y); // OF POINT IN CUBE.
+	z -= Math.floor(z);
 
-      var u = fade(x);                                // COMPUTE FADE CURVES
-      var v = fade(y);                                // FOR EACH OF X,Y,Z.
-      var w = fade(z);
+	var u = fade(x); // COMPUTE FADE CURVES
+	var v = fade(y); // FOR EACH OF X,Y,Z.
+	var w = fade(z);
 
-      var A = p[X  ]+Y;                        // HASH COORDINATES OF
-      var AA = p[A]+Z;                          // THE 8 CUBE CORNERS,
-      var AB = p[A+1]+Z;
+	var A = p[X] + Y; // HASH COORDINATES OF
+	var AA = p[A] + Z; // THE 8 CUBE CORNERS,
+	var AB = p[A + 1] + Z;
 
-      var B = p[X+1]+Y;
-      var BA = p[B]+Z;
-      var BB = p[B+1]+Z;
+	var B = p[X + 1] + Y;
+	var BA = p[B] + Z;
+	var BB = p[B + 1] + Z;
 
-      return lerp(w, lerp(v, lerp(u, grad(p[AA  ], x  , y  , z   ),  // AND ADD
-				     grad(p[BA  ], x-1, y  , z   )), // BLENDED
-			     lerp(u, grad(p[AB  ], x  , y-1, z   ),  // RESULTS
-				     grad(p[BB  ], x-1, y-1, z   ))),// FROM  8
-		     lerp(v, lerp(u, grad(p[AA+1], x  , y  , z-1 ),  // CORNERS
-				     grad(p[BA+1], x-1, y  , z-1 )), // OF CUBE
-			     lerp(u, grad(p[AB+1], x  , y-1, z-1 ),
-				     grad(p[BB+1], x-1, y-1, z-1 ))));
-}
-
-function fade(t) { return t * t * t * (t * (t * 6 - 15) + 10); }
-
-function lerp(t, a, b) { return a + t * (b - a); }
-
-function grad(hash, x, y, z)
-{
-      var h = hash & 15;                      // CONVERT LO 4 BITS OF HASH CODE
-      var u = h<8 ? x : y;                 // INTO 12 GRADIENT DIRECTIONS.
-      var v = h<4 ? y : h==12||h==14 ? x : z;
-      return ((h&1) == 0 ? u : -u) + ((h&2) == 0 ? v : -v);
+	return lerp(w, lerp(v, lerp(u, grad(p[AA], x, y, z), // AND ADD
+	grad(p[BA], x - 1, y, z)), // BLENDED
+	lerp(u, grad(p[AB], x, y - 1, z), // RESULTS
+	grad(p[BB], x - 1, y - 1, z))), // FROM  8
+	lerp(v, lerp(u, grad(p[AA + 1], x, y, z - 1), // CORNERS
+	grad(p[BA + 1], x - 1, y, z - 1)), // OF CUBE
+	lerp(u, grad(p[AB + 1], x, y - 1, z - 1), grad(p[BB + 1], x - 1, y - 1, z - 1))));
 }
 
 // fractal sum
-function fBm2d(x, y, octaves)
-{
+function fBm2d(x, y, octaves) {
 	var lacunarity = 2.0;
 	var gain = 0.5;
 
@@ -104,17 +106,15 @@ function fBm2d(x, y, octaves)
 	var amp = 0.5;
 
 	var sum = 0;
-	for(var i=0; i<octaves; i++)
-	{
-		sum += noise2d(x*freq, y*freq)*amp;
+	for (var i = 0; i < octaves; i++) {
+		sum += noise2d(x * freq, y * freq) * amp;
 		freq *= lacunarity;
 		amp *= gain;
 	}
 	return sum;
 }
 
-function fBm3d(x, y, z, octaves)
-{
+function fBm3d(x, y, z, octaves) {
 	var lacunarity = 2.0;
 	var gain = 0.5;
 
@@ -122,9 +122,8 @@ function fBm3d(x, y, z, octaves)
 	var amp = 0.5;
 
 	var sum = 0;
-	for(var i=0; i<octaves; i++)
-	{
-		sum += noise3d(x*freq, y*freq, z*freq)*amp;
+	for (var i = 0; i < octaves; i++) {
+		sum += noise3d(x * freq, y * freq, z * freq) * amp;
 		freq *= lacunarity;
 		amp *= gain;
 	}
@@ -132,8 +131,7 @@ function fBm3d(x, y, z, octaves)
 }
 
 // Turbulence - absolute value of noise summed
-function turbulence2d(x, y, octaves)
-{
+function turbulence2d(x, y, octaves) {
 	var lacunarity = 2.0;
 	var gain = 0.5;
 
@@ -141,17 +139,15 @@ function turbulence2d(x, y, octaves)
 	var freq = 1.0;
 	var amp = 1.0;
 
-	for(var i=0; i<octaves; i++)
-	{
-		sum += Math.abs(noise2d(x*freq, y*freq))*amp;
+	for (var i = 0; i < octaves; i++) {
+		sum += Math.abs(noise2d(x * freq, y * freq)) * amp;
 		freq *= lacunarity;
 		amp *= gain;
 	}
 	return sum;
 }
 
-function turbulence3d(x, y, z, octaves)
-{
+function turbulence3d(x, y, z, octaves) {
 	var lacunarity = 2.0;
 	var gain = 0.5;
 
@@ -159,9 +155,8 @@ function turbulence3d(x, y, z, octaves)
 	var freq = 1.0;
 	var amp = 1.0;
 
-	for(var i=0; i<octaves; i++)
-	{
-		sum += Math.abs(noise3d(x*freq, y*freq, z*freq))*amp;
+	for (var i = 0; i < octaves; i++) {
+		sum += Math.abs(noise3d(x * freq, y * freq, z * freq)) * amp;
 		freq *= lacunarity;
 		amp *= gain;
 	}
@@ -170,16 +165,14 @@ function turbulence3d(x, y, z, octaves)
 
 // Ridged multifractal
 // See "Texturing & Modeling, A Procedural Approach", Chapter 12
-function ridge(h, offset)
-{
-    h = Math.abs(h);
-    h = offset - h;
-    h = h * h;
-    return h;
+function ridge(h, offset) {
+	h = Math.abs(h);
+	h = offset - h;
+	h = h * h;
+	return h;
 }
 
-function ridgedmf2d(x, y, octaves)
-{
+function ridgedmf2d(x, y, octaves) {
 	var lacunarity = 2.0;
 	var gain = 0.5;
 	var offset = 1.0;
@@ -189,10 +182,9 @@ function ridgedmf2d(x, y, octaves)
 	var amp = 0.5;
 	var prev = 1.0;
 
-	for(var i=0; i<octaves; i++)
-	{
-		var n = ridge(noise2d(x*freq, y*freq), offset);
-		sum += n*amp*prev;
+	for (var i = 0; i < octaves; i++) {
+		var n = ridge(noise2d(x * freq, y * freq), offset);
+		sum += n * amp * prev;
 		prev = n;
 		freq *= lacunarity;
 		amp *= gain;
@@ -200,8 +192,7 @@ function ridgedmf2d(x, y, octaves)
 	return sum;
 }
 
-function ridgedmf3d(x, y, z, octaves)
-{
+function ridgedmf3d(x, y, z, octaves) {
 	var lacunarity = 2.0;
 	var gain = 0.5;
 	var offset = 1.0;
@@ -211,10 +202,9 @@ function ridgedmf3d(x, y, z, octaves)
 	var amp = 0.5;
 	var prev = 1.0;
 
-	for(var i=0; i<octaves; i++)
-	{
-		var n = ridge(noise3d(x*freq, y*freq, z*freq), offset);
-		sum += n*amp*prev;
+	for (var i = 0; i < octaves; i++) {
+		var n = ridge(noise3d(x * freq, y * freq, z * freq), offset);
+		sum += n * amp * prev;
 		prev = n;
 		freq *= lacunarity;
 		amp *= gain;
