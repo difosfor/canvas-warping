@@ -4,6 +4,8 @@
 
 	'use strict';
 
+	var zoom = 5;
+	var octaves = 8;
 
 	var elem = document.getElementsByTagName('canvas')[0];
 	var context = elem.getContext('2d');
@@ -16,61 +18,40 @@
 		var data = imageData.data;
 		var x, y;
 
+		// scale input to normalized vector size
+		function scaleX(x) {
+			return x / w * zoom;
+		}
+
+		function scaleY(y) {
+			return y / h * zoom;
+		}
+
 		// convert the result from [-1, 1] to [0, 1] and to [0, 255]
 		function to255(v) {
 			return (v * 0.5 + 0.5) * 255;
 		}
 
-		function fbm(px, py) {
-			var zoom = 5;
-			var v = fBm2d(px / w * zoom, py / h * zoom, 8);
-			return to255(v);
-			// return v;
+		function fbm(sx, sy) {
+			return fBm2d(sx, sy, octaves);
 		}
 
-		function pattern1(px, py) {
-			var v = fbm(px, py);
-			return [v, v, v];
+		function fbm1(sx, sy) {
+			return fbm(sx, sy);
 		}
 
-		function pattern2(px, py) {
-			var qx = fbm(px, py);
-			var qy = fbm(px + 5.2, py + 1.3);
-			var v = fbm(px + 4 * qx, py + 4 * qy);
-			return [v, v, v];
+		function fbm2(sx, sy) {
+			var qx = fbm(sx, sy);
+			var qy = fbm(sx + 5.2, sy + 1.3);
+			return fbm(sx + 4 * qx, sy + 4 * qy);
 		}
 
-		function pattern3(px, py) {
-			var qx = fbm(px, py);
-			var qy = fbm(px + 5.2, py + 1.3);
-			var rx = fbm(px + 4 * qx + 1.7, py + 4 * qy + 9.2);
-			var ry = fbm(px + 4 * qx + 8.3, py + 4 * qy + 2.8);
-			var v = fbm(px + 4 * rx, py + 4 * ry);
-			return [v, v, v];
-		}
-
-		function pattern4(px, py) {
-			var qx = fbm(px, py);
-			var qy = fbm(px + 5.2, py + 1.3);
-			var rx = fbm(px + 4 * qx + 1.7, py + 4 * qy + 9.2);
-			var ry = fbm(px + 4 * qx + 8.3, py + 4 * qy + 2.8);
-			var v = fbm(px + 4 * rx, py + 4 * ry);
-			return [v, v, v];
-		}
-
-		function patternNoise(px, py) {
-			var v = noise2d(px, py);
-			return [v, v, v];
-		}
-
-		function patternTurbulence(px, py) {
-			var v = turbulence2d(px, py, 8);
-			return [v, v, v];
-		}
-
-		function patternRidged(px, py) {
-			var v = ridgedmf2d(px, py, 8);
-			return [v, v, v];
+		function fbm3(sx, sy) {
+			var qx = fbm(sx, sy);
+			var qy = fbm(sx + 5.2, sy + 1.3);
+			var rx = fbm(sx + 4 * qx + 1.7, sy + 4 * qy + 9.2);
+			var ry = fbm(sx + 4 * qx + 8.3, sy + 4 * qy + 2.8);
+			return fbm(sx + 4 * rx, sy + 4 * ry);
 		}
 
 		function putPixel(x, y, r, g, b, a) {
@@ -89,14 +70,20 @@
 
 		for (y = 0; y < h; y++) {
 			for (x = 0; x < w; x++) {
-				// var v = pattern1(x, y);
-				// var v = pattern2(x, y);
-				var v = pattern3(x, y);
-				// var v = pattern4(x, y);
-				// var v = patternNoise(x, y);
-				// var v = patternTurbulence(x, y);
-				// var v = patternRidged(x, y);
-				putPixel(x, y, v[0], v[1], v[2]);
+				var sx = scaleX(x);
+				var sy = scaleY(y);
+
+				// var v = fbm1(sx, sy);
+				// var v = fbm2(sx, sy);
+				var v = fbm3(sx, sy);
+
+				// var v = noise2d(sx, sy);
+				// var v = turbulence2d(sx, sy, octaves);
+				// var v = ridgedmf2d(sx, sy, octaves);
+
+				v = to255(v);
+
+				putPixel(x, y, v, v, v);
 			}
 		}
 
