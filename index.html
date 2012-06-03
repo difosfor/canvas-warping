@@ -20,15 +20,19 @@
 		Why you no have canvas?
 	</canvas>
 	<div class="bar">
-		<a href="#" onclick="draw(noise2d)">noise2d</a> |
-		<a href="#" onclick="draw(turbulence2d)">turbulence2d</a> |
-		<a href="#" onclick="draw(ridgedmf2d)">ridgedmf2d</a> |
-		<a href="#" onclick="draw(fbm1)">fbm1</a> |
-		<a href="#" onclick="draw(fbm2)">fbm2</a> |
-		<a href="#" onclick="draw(fbm3)">fbm3</a>
+		Function:
+		<a href="#" onclick="draw('noise')">noise</a> |
+		<a href="#" onclick="draw('turbulence')">turbulence</a> |
+		<a href="#" onclick="draw('ridged')">ridged</a> |
+		<a href="#" onclick="draw('fbm1')">fbm1</a> |
+		<a href="#" onclick="draw('fbm2')">fbm2</a> |
+		<a href="#" onclick="draw('fbm3')">fbm3</a>
+
+		Resize: <input id="resize" type="checkbox">
+		Zoom: <input id="zoom" type="range" min="1" max="20" step="1" value="10">
 	</div>
 
 	<script type="text/javascript" src="noise.js"></script>
-	<script type="text/javascript" src="warping.js"></script>
+	<script type="text/javascript" src="draw.js"></script>
 </body>
 </html>
