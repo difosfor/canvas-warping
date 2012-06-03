@@ -58,6 +58,21 @@
 			return [v, v, v];
 		}
 
+		function patternNoise(px, py) {
+			var v = noise2d(px, py);
+			return [v, v, v];
+		}
+
+		function patternTurbulence(px, py) {
+			var v = turbulence2d(px, py, 8);
+			return [v, v, v];
+		}
+
+		function patternRidged(px, py) {
+			var v = ridgedmf2d(px, py, 8);
+			return [v, v, v];
+		}
+
 		function putPixel(x, y, r, g, b, a) {
 			a = a !== undefined ? a : 255;
 			var i = (y * w + x) * 4;
@@ -78,6 +93,9 @@
 				// var v = pattern2(x, y);
 				var v = pattern3(x, y);
 				// var v = pattern4(x, y);
+				// var v = patternNoise(x, y);
+				// var v = patternTurbulence(x, y);
+				// var v = patternRidged(x, y);
 				putPixel(x, y, v[0], v[1], v[2]);
 			}
 		}
