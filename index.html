@@ -7,12 +7,27 @@
 			height: 100%;
 			margin: 0;
 		}
+
+		.bar {
+			position: absolute;
+			bottom: 10px;
+			right: 10px;
+		}
 	</style>
 </head>
 <body>
-	<canvas width="800" height="600">
+	<canvas width="640" height="480">
 		Why you no have canvas?
 	</canvas>
+	<div class="bar">
+		<a href="#" onclick="draw(noise2d)">noise2d</a> |
+		<a href="#" onclick="draw(turbulence2d)">turbulence2d</a> |
+		<a href="#" onclick="draw(ridgedmf2d)">ridgedmf2d</a> |
+		<a href="#" onclick="draw(fbm1)">fbm1</a> |
+		<a href="#" onclick="draw(fbm2)">fbm2</a> |
+		<a href="#" onclick="draw(fbm3)">fbm3</a>
+	</div>
+
 	<script type="text/javascript" src="noise.js"></script>
 	<script type="text/javascript" src="warping.js"></script>
 </body>
