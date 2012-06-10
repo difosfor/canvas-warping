@@ -15,7 +15,6 @@
     <link rel="stylesheet" href="stylesheets/ie.css">
     <![endif]-->
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-
   </head>
   <body>
       <div id="header">
@@ -32,32 +31,28 @@
 
         <div id="title">
           <h1>Canvas-warping</h1>
-          <p>A little experiment with HTML Canvas and procedural marble texture</p>
+          <p>A little experiment with HTML Canvas and procedural textures.</p>
           <hr>
           <span class="credits left">Project maintained by <a href="https://github.com/difosfor">difosfor</a></span>
           <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="http://twitter.com/#!/michigangraham">mattgraham</a></span>
         </div>
 
-        <p>Here's what it looks like:</p>
+        <p>Choose a function and use the controls below to control the texture rendering.</p>
 
-        <canvas width="640" height="480">
-          Why you no have canvas?
-        </canvas>
-        <div class="bar">
+        <div>
           Function:
-          <a href="#" onclick="draw('noise')">noise</a> |
-          <a href="#" onclick="draw('turbulence')">turbulence</a> |
-          <a href="#" onclick="draw('ridged')">ridged</a> |
           <a href="#" onclick="draw('fbm1')">fbm1</a> |
           <a href="#" onclick="draw('fbm2')">fbm2</a> |
           <a href="#" onclick="draw('fbm3')">fbm3</a> |
           <a href="#" onclick="draw('fbmAdH')">fbmAdH</a> |
           <a href="#" onclick="draw('fbmPPE')">fbmPPE</a>
           <br>
-          Resize: <input id="resize" type="checkbox">
-          <br>
           Zoom: <input id="zoom" type="range" min="1" max="20" step="1" value="10">
         </div>
+
+        <canvas width="640" height="480">
+          Why you no have canvas?
+        </canvas>
 
       </section>
     </div>
