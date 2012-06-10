@@ -106,7 +106,7 @@
 	}, false);
 
 	// Perform initial draw
-	if (storage.resize) {
+	if (resizeInput.checked) {
 		onResize();
 	} else {
 		draw();
