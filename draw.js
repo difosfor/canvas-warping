@@ -4,6 +4,9 @@
 
 	'use strict';
 
+	// Constants
+	var DEFAULT_ZOOM = 7;
+
 	// Shortcuts
 	var console = window.console;
 	var storage = window.localStorage;
@@ -38,7 +41,7 @@
 		}
 
 		var f = noise[fn]; // resolve noise function name to function
-		var zoom = parseFloat(storage.zoom);
+		var zoom = parseFloat(storage.zoom) || DEFAULT_ZOOM;
 		var w = canvas.width;
 		var h = canvas.height;
 		var start, x, y, sx, sy, rgb, i, di;
@@ -80,6 +83,17 @@
 		console.log('draw(): put image data time: ' + (Date.now() - start));
 	}, 500);
 
+	// Initialize and bind zoom input
+	if (zoomInput) {
+		zoomInput.value = storage.zoom || DEFAULT_ZOOM;
+
+		zoomInput.addEventListener('change', function() {
+			console.log('onChange: zoom: ' + zoomInput.value);
+			storage.zoom = zoomInput.value;
+			draw();
+		}, false);
+	}
+
 	// Initialize and bind resize input
 	if (resizeInput) {
 		resizeInput.checked = storage.resize === 'true' ? true : false;
@@ -106,17 +120,6 @@
 
 		// Perform initial resize
 		onResize();
-	}
-
-	// Initialize and bind zoom input
-	if (zoomInput) {
-		zoomInput.value = storage.zoom;
-
-		zoomInput.addEventListener('change', function() {
-			console.log('onChange: zoom: ' + zoomInput.value);
-			storage.zoom = zoomInput.value;
-			draw();
-		}, false);
 	}
 
 	// Perform initial draw
