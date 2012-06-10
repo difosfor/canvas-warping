@@ -13,6 +13,8 @@
 	var zoomInput = document.getElementById('zoom');
 	var canvas = document.getElementsByTagName('canvas')[0];
 	var context = canvas.getContext('2d');
+	var originalWidth = canvas.width;
+	var originalHeight = canvas.height;
 
 	// Functions
 	function debounce(callback, ms) {
@@ -36,7 +38,7 @@
 		}
 
 		var f = noise[fn]; // resolve noise function name to function
-		var zoom = parseFloat(zoomInput.value);
+		var zoom = parseFloat(storage.zoom);
 		var w = canvas.width;
 		var h = canvas.height;
 		var start, x, y, sx, sy, rgb, i, di;
@@ -78,39 +80,47 @@
 		console.log('draw(): put image data time: ' + (Date.now() - start));
 	}, 500);
 
-	// Initialize inputs
-	resizeInput.checked = storage.resize === 'true' ? true : false;
-	zoomInput.value = storage.zoom;
+	// Initialize and bind resize input
+	if (resizeInput) {
+		resizeInput.checked = storage.resize === 'true' ? true : false;
 
-	// Bind inputs
-	function onResize() {
-		if (resizeInput.checked) {
-			canvas.width = window.innerWidth;
-			canvas.height = window.innerHeight;
-			draw();
-		}
+		var onResize = function() {
+			if (resizeInput.checked) {
+				canvas.width = window.innerWidth;
+				canvas.height = window.innerHeight;
+				draw();
+			} else if (canvas.width !== originalWidth || canvas.height !== originalHeight) {
+				canvas.width = originalWidth;
+				canvas.height = originalHeight;
+				draw();
+			}
+		};
+
+		resizeInput.addEventListener('change', function() {
+			console.log('onChange: resize: ' + resizeInput.checked);
+			storage.resize = resizeInput.checked;
+			onResize();
+		}, false);
+
+		window.addEventListener('resize', onResize, false);
+
+		// Perform initial resize
+		onResize();
 	}
 
-	resizeInput.addEventListener('change', function() {
-		console.log('onChange: resize: ' + resizeInput.checked);
-		storage.resize = resizeInput.checked;
-		onResize();
-	}, false);
+	// Initialize and bind zoom input
+	if (zoomInput) {
+		zoomInput.value = storage.zoom;
 
-	window.addEventListener('resize', onResize, false); // TODO: debounce
-
-	zoomInput.addEventListener('change', function() {
-		console.log('onChange: zoom: ' + zoomInput.value);
-		storage.zoom = zoomInput.value;
-		draw();
-	}, false);
+		zoomInput.addEventListener('change', function() {
+			console.log('onChange: zoom: ' + zoomInput.value);
+			storage.zoom = zoomInput.value;
+			draw();
+		}, false);
+	}
 
 	// Perform initial draw
-	if (resizeInput.checked) {
-		onResize();
-	} else {
-		draw();
-	}
+	draw();
 
 	// Expose
 	window.draw = draw;
