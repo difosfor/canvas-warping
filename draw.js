@@ -33,13 +33,8 @@
 		};
 	}
 
-	var draw = debounce(function(fn) {
-		if (fn) {
-			storage.fn = fn;
-		} else {
-			fn = storage.fn;
-		}
-
+	var draw = debounce(function() {
+		var fn = storage.fn;
 		var f = noise[fn]; // resolve noise function name to function
 		var zoom = parseFloat(storage.zoom) || DEFAULT_ZOOM;
 		var w = canvas.width;
@@ -122,10 +117,18 @@
 		onResize();
 	}
 
+	// Bind function links
+	function onClickDraw(e) {
+		e.preventDefault();
+		storage.fn = e.target.getAttribute('data-fn');
+		draw();
+	}
+
+	var linkNodes = document.querySelectorAll('[data-fn]');
+	for (var n = 0; n < linkNodes.length; n++) {
+		linkNodes[n].addEventListener('click', onClickDraw, false);
+	}
+
 	// Perform initial draw
 	draw();
-
-	// Expose
-	window.draw = draw;
-
 }());
