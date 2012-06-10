@@ -3,8 +3,12 @@
 	'use strict';
 
 	// Helper functions
+	function to1(v) {
+		return (v + 1) / 2;
+	}
+
 	function to255(v) {
-		return (v + 1) * 255 / 2;
+		return to1(v) * 255;
 	}
 
 	function grayscale(v) {
@@ -239,18 +243,9 @@
 	function fbm3(x, y) {
 		var qx = fbm1(x, y);
 		var qy = fbm1(x + 5.2, y + 1.3);
-		var ql = Math.sqrt(qx * qx + qy * qy);
-
 		var rx = fbm1(x + 4 * qx + 1.7, y + 4 * qy + 9.2);
 		var ry = fbm1(x + 4 * qx + 8.3, y + 4 * qy + 2.8);
-		var rl = Math.sqrt(rx * rx + ry * ry);
-
-		var v = fbm1(x + 4 * rx, y + 4 * ry);
-
-		// var brown = 90	60	24;
-		// var blue = 109	123	123;
-
-		return [ to255(v), to255(ql), to255(rl) ];
+		return fbm1(x + 4 * rx, y + 4 * ry);
 	}
 
 	function fbmAdH(x, y) {
@@ -294,6 +289,49 @@
 		return [ red, green, blue ];
 	}
 
+	function fbmPPE(x, y) {
+		var brightness = 0;
+		// var brightness = 50;
+
+		// var gain = 0;
+		// var gain = 0.5;
+		var gain = 1;
+
+		var qx = fbm1(x, y);
+		var qy = fbm1(x + 5.2, y + 1.3);
+
+		var qv = Math.sqrt(qx * qx + qy * qy); // length of q
+		// var qv = Math.abs(qx);
+		// var qv = Math.abs(qy);
+		// var qv = to1(qx);
+		// var qv = to1(qy);
+
+		var qr = qv * 227;
+		var qg = qv * 168;
+		var qb = qv * 32;
+
+		var rx = fbm1(x + 4 * qx + 1.7, y + 4 * qy + 9.2);
+		var ry = fbm1(x + 4 * qx + 8.3, y + 4 * qy + 2.8);
+
+		var rv = Math.sqrt(rx * rx + ry * ry); // length of r
+		// var rv = Math.abs(rx);
+		// var rv = Math.abs(ry);
+		// var rv = to1(rx);
+		// var rv = to1(ry);
+
+		var rr = rv * 227;
+		var rg = rv * 242;
+		var rb = rv * 250;
+
+		var v = to1(fbm1(x + 4 * rx, y + 4 * ry)) + gain;
+
+		var r = v * (qr + rr + brightness);
+		var g = v * (qg + rg + brightness);
+		var b = v * (qb + rb + brightness);
+
+		return [ r, g, b ];
+	}
+
 	// Expose
 	window.noise = {
 		noise: function(x, y) {
@@ -312,10 +350,13 @@
 			return grayscale(fbm2(x, y));
 		},
 		fbm3: function(x, y) {
-			return fbm3(x, y);
+			return grayscale(fbm3(x, y));
 		},
 		fbmAdH: function(x, y) {
 			return fbmAdH(x, y);
+		},
+		fbmPPE: function(x, y) {
+			return fbmPPE(x, y);
 		}
 	};
 }());
