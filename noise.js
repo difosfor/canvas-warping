@@ -2,6 +2,17 @@
 
 	'use strict';
 
+	// Helper functions
+	function to255(v) {
+		return (v + 1) * 255 / 2;
+	}
+
+	function grayscale(v) {
+		v = to255(v);
+		return [ v, v, v ];
+	}
+
+	// Basic noise functions
 	var p = [
 		151,160,137,91,90,15,
 		131,13,201,95,96,53,194,233,7,225,140,36,103,30,69,142,8,99,37,240,21,10,23,
@@ -228,15 +239,18 @@
 	function fbm3(x, y) {
 		var qx = fbm1(x, y);
 		var qy = fbm1(x + 5.2, y + 1.3);
+		var ql = Math.sqrt(qx * qx + qy * qy);
+
 		var rx = fbm1(x + 4 * qx + 1.7, y + 4 * qy + 9.2);
 		var ry = fbm1(x + 4 * qx + 8.3, y + 4 * qy + 2.8);
-		return fbm1(x + 4 * rx, y + 4 * ry);
-	}
+		var rl = Math.sqrt(rx * rx + ry * ry);
 
-	// Color conversion functions
-	function grayscale(a) {
-		a = (a + 1) * 255 / 2;
-		return [ a, a, a ];
+		var v = fbm1(x + 4 * rx, y + 4 * ry);
+
+		// var brown = 90	60	24;
+		// var blue = 109	123	123;
+
+		return [ to255(v), to255(ql), to255(rl) ];
 	}
 
 	// Expose
@@ -257,7 +271,7 @@
 			return grayscale(fbm2(x, y));
 		},
 		fbm3: function(x, y) {
-			return grayscale(fbm3(x, y));
+			return fbm3(x, y);
 		}
 	};
 
