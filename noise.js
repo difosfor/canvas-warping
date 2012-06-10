@@ -253,6 +253,47 @@
 		return [ to255(v), to255(ql), to255(rl) ];
 	}
 
+	function fbmAdH(x, y) {
+		var qx = fbm1(x, y);
+		var qy = fbm1(x + 5.2, y + 1.3);
+
+		var rx = fbm1(x + 4 * qx + 1.7, y + 4 * qy + 9.2);
+		var ry = fbm1(x + 4 * qx + 8.3, y + 4 * qy + 2.8);
+
+		var v = fbm1(x + 4 * rx, y + 4 * ry);
+
+		var ramp_start = [0, 0, 0];
+		var ramp_end = [100, 150, 150];
+
+		var v_smooth = Math.sin(Math.PI*((v+0.5)/8));
+
+		var red = ramp_start[0] + v_smooth*(ramp_end[0]-ramp_start[0]);
+		var green = ramp_start[1] + v_smooth*(ramp_end[1]-ramp_start[1]);
+		var blue = ramp_start[2] + v_smooth*(ramp_end[2]-ramp_start[2]);
+
+		var qx_abs = Math.sin(Math.PI*(qx));
+		red += qx_abs*173;
+		green += qx_abs*112;
+		blue += qx_abs*14;
+
+		var qy_abs = Math.sin(Math.PI*(qy));
+		red += qy_abs*158;
+		green += qy_abs*151;
+		blue += qy_abs*125;
+
+		var rx_abs = Math.sin(Math.PI*(rx));
+		red += rx_abs*36;
+		green += rx_abs*38;
+		blue += rx_abs*79;
+
+		var ry_abs = Math.sin(Math.PI*((ry+0.5)/8));
+		red += ry_abs*255;
+		green += ry_abs*255;
+		blue += ry_abs*255;
+
+		return [ red, green, blue ];
+	}
+
 	// Expose
 	window.noise = {
 		noise: function(x, y) {
@@ -272,7 +313,9 @@
 		},
 		fbm3: function(x, y) {
 			return fbm3(x, y);
+		},
+		fbmAdH: function(x, y) {
+			return fbmAdH(x, y);
 		}
 	};
-
 }());
