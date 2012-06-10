@@ -15,7 +15,20 @@
 	var context = canvas.getContext('2d');
 
 	// Functions
-	function draw(fn) {
+	function debounce(callback, ms) {
+		var timeout;
+		return function() {
+			var args = arguments;
+			var thisArg = this;
+			clearTimeout(timeout);
+			timeout = setTimeout(function() {
+				timeout = null;
+				callback.apply(thisArg, args);
+			}, ms);
+		};
+	}
+
+	var draw = debounce(function(fn) {
 		if (fn) {
 			storage.fn = fn;
 		} else {
@@ -63,14 +76,11 @@
 		start = Date.now();
 		context.putImageData(imageData, 0, 0);
 		console.log('draw(): put image data time: ' + (Date.now() - start));
-	}
+	}, 500);
 
 	// Initialize inputs
 	resizeInput.checked = storage.resize === 'true' ? true : false;
 	zoomInput.value = storage.zoom;
-
-	// Perform initial draw
-	draw();
 
 	// Bind inputs
 	function onResize() {
@@ -94,6 +104,13 @@
 		storage.zoom = zoomInput.value;
 		draw();
 	}, false);
+
+	// Perform initial draw
+	if (storage.resize) {
+		onResize();
+	} else {
+		draw();
+	}
 
 	// Expose
 	window.draw = draw;
