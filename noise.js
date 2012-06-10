@@ -233,18 +233,32 @@
 		return fbm1(x + 4 * rx, y + 4 * ry);
 	}
 
+	// Color conversion functions
+	function grayscale(a) {
+		a = (a + 1) * 255 / 2;
+		return [ a, a, a ];
+	}
+
 	// Expose
 	window.noise = {
-		noise: noise2d,
+		noise: function(x, y) {
+			return grayscale(noise2d(x, y));
+		},
 		turbulence: function(x, y) {
-			return turbulence2d(x, y, 8);
+			return grayscale(turbulence2d(x, y, 8));
 		},
 		ridged: function(x, y) {
-			return ridgedmf2d(x, y, 8);
+			return grayscale(ridgedmf2d(x, y, 8));
 		},
-		fbm1: fbm1,
-		fbm2: fbm2,
-		fbm3: fbm3
+		fbm1: function(x, y) {
+			return grayscale(fbm1(x, y));
+		},
+		fbm2: function(x, y) {
+			return grayscale(fbm2(x, y));
+		},
+		fbm3: function(x, y) {
+			return grayscale(fbm3(x, y));
+		}
 	};
 
 }());
